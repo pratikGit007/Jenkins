@@ -1,0 +1,9 @@
+commit 703cc9d7acde39db348f7945410b622e9ed02c9d
+tree b8307edc802ebff4dbb4079ac6dfd5708618e350
+parent 7095a79e8f85ef6d76f3a231507d00bab6c5441e
+author Pratik Homkar <pratikhomkar@gmail.com> 2024-07-11 16:30:58 +0530
+committer GitHub <noreply@github.com> 2024-07-11 16:30:58 +0530
+
+    Update Jenkinsfile with mvn clean
+
+:100644 100644 9c2865a32b27636b1f43732299fe405256cb5846 7d5ff00ba66275674dcd31529968899b468a2fac M	Jenkinsfile

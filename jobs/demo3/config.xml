@@ -1,0 +1,102 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1400.v7fd111b_ec82f">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2203.v89fa_170c2b_f5"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2203.v89fa_170c2b_f5">
+      <jobProperties/>
+      <triggers/>
+      <parameters>
+        <string>Git_Branch</string>
+      </parameters>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description>demo3</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>1</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>Git_Branch</name>
+          <description>branch name</description>
+          <defaultValue>master</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3908.vd6b_b_5a_a_54010">
+    <script>pipeline {
+    agent any
+    
+    tools{
+        maven &apos;maven3&apos;
+    }
+    
+    parameters{
+        string (name: &apos;Git_Branch&apos;, defaultValue: &apos;master&apos;, description: &apos;branch name&apos;)
+    }
+    stages{
+        stage(&apos;Git checkout&apos;) {
+            steps {
+                git branch: &quot;${params.Git_Branch}&quot;, url: &apos;https://github.com/pratikGit007/Boardgame.git&apos;
+            }
+        }
+     
+        stage(&apos;Maven clean&apos;) {
+            steps {
+                sh &apos;mvn clean&apos; 
+            }
+        }
+        stage(&apos;Maven package&apos;) {
+            steps {
+                sh &apos;mvn package&apos; 
+            }
+        }
+    }
+    post {
+always {
+script {
+def jobName = env.JOB_NAME
+def buildNumber = env.BUILD_NUMBER
+def pipelineStatus = currentBuild.result ?: &apos;UNKNOWN&apos;
+def bannerColor = pipelineStatus.toUpperCase() == &apos;SUCCESS&apos; ? &apos;green&apos; : &apos;red&apos;
+def body = &quot;&quot;&quot;
+&lt;html&gt;
+&lt;body&gt;
+&lt;div style=&quot;border: 4px solid ${bannerColor}; padding: 10px;&quot;&gt;
+&lt;h2&gt;${jobName} - Build ${buildNumber}&lt;/h2&gt;
+&lt;div style=&quot;background-color: ${bannerColor}; padding: 10px;&quot;&gt;
+&lt;h3 style=&quot;color: white;&quot;&gt;Pipeline Status: ${pipelineStatus.toUpperCase()}&lt;/h3&gt;
+&lt;/div&gt;
+&lt;p&gt;Check the &lt;a href=&quot;${BUILD_URL}&quot;&gt;console output&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&quot;&quot;&quot;
+emailext (
+subject: &quot;${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}&quot;,
+body: body,
+to: &apos;pratikhomkar@gmail.com&apos;,
+from: &apos;pratikhomkar@gmail.com&apos;,
+replyTo: &apos;pratikhomkar@gmail.com&apos;,
+mimeType: &apos;text/html&apos;,
+)
+}
+}
+}
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
